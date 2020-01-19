@@ -17,25 +17,28 @@ class WorldTime{
       //make the request
       Response response = await get('http://worldtimeapi.org/api/timezone/$url');
       Map data = jsonDecode(response.body);
-//    print(data);
-//    print("after print data");
+      print(data);
+
 
       //get properties from data
       String datetime = data['datetime'];
-      String offset = data['utc_offset'].substring(1,3);
-//    print(datetime);
-//    print(offset);
+      int offsetHours = int.parse(data['utc_offset'].substring(1,3));
+      int offsetMinutes = int.parse(data['utc_offset'].substring(4,6));
+
+      if (data['utc_offset'].substring(0, 1) == "-") {
+        offsetHours = -offsetHours;
+        offsetMinutes = -offsetMinutes;
+      }
 
       // create DateTime object
       DateTime now = DateTime.parse(datetime);
-      now = now.add(Duration(hours: int.parse(offset)));
+      now = now.add(Duration(hours: offsetHours, minutes: offsetMinutes));
 
       // set time property
-      isDayTime = now.hour > 6 && now.hour < 20 ? true : false;
+      isDayTime = now.hour > 6 && now.hour < 19 ? true : false;
       time = DateFormat.jm().format(now);
     }
     catch (e) {
-//      print('Caught exception - $e');
       time = 'Could not get the requested time, sorry!';
     }
 
